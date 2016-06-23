@@ -47,6 +47,5 @@ Temporary Items
 .apdisk
 
 # Visual Studio Generated files
-bin/
 obj/
 *.user
