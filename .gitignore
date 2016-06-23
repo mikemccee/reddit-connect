@@ -49,3 +49,6 @@ Temporary Items
 # Visual Studio Generated files
 obj/
 *.user
+*.pdb
+*.pdb
+bin/reddit-connect.pdb
