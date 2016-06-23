@@ -13,5 +13,13 @@ namespace reddit_connect
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
         }
+
+        protected void Application_Error(Object sender, EventArgs e)
+        {
+            Exception ex = Server.GetLastError().GetBaseException();
+
+            Elmah.ErrorLog.GetDefault(HttpContext.Current).Log(new Elmah.Error(ex));
+        }
+
     }
 }
