@@ -22,11 +22,18 @@ namespace reddit_connect.Controllers
             dataConnection = new SqlDataConnection();
         }
 
-        // GET api/content
-        public IEnumerable<ContentModel> Get(Guid? accessToken)
+        // GET api/content/all
+        [HttpGet, ActionName("all")]
+        public IEnumerable<ContentModel> All(Guid? accessToken = null)
         {
             if (accessToken == null)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Access token is required."));
+
+            var user =
+                dataConnection.FetchUser(accessToken: accessToken.Value);
+
+            if (user == null)
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.NotFound, "No user could be found with that access token.  Plesae try again."));
 
             List<ContentModel> contentList = new List<ContentModel>();
 
@@ -67,6 +74,7 @@ namespace reddit_connect.Controllers
         }
 
         // POST api/content/favorite
+        [HttpPost, ActionName("favorite")]
         public HttpResponseMessage Favorite([FromBody]FavoriteModel favoriteModel)
         {
             if (favoriteModel == null || !favoriteModel.AccessToken.HasValue)

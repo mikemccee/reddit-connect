@@ -126,7 +126,7 @@ namespace reddit_connect.Database
         public bool UpdateUser(User user)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            SqlCommand sqlCommand = new SqlCommand("update Users set token = @token)", sqlConnection);
+            SqlCommand sqlCommand = new SqlCommand("update Users set token = @token", sqlConnection);
 
             sqlCommand.Parameters.AddWithValue("@token", user.Token);
 
@@ -155,7 +155,7 @@ namespace reddit_connect.Database
 
             sqlCommand.Parameters.AddWithValue("@userid", userID);
             sqlCommand.Parameters.AddWithValue("@contentid", contentID);
-            sqlCommand.Parameters.AddWithValue("@tagname", tagName);
+            sqlCommand.Parameters.AddWithValue("@tagname", tagName ?? "");
 
             using (sqlConnection)
             {

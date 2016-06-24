@@ -32,7 +32,7 @@ namespace reddit_connect.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "A user already exists with that email address.  Please log in.");
 
             string saltString, hashString;
-            encryptionProvider.GetHashAndSaltString(userModel.Password, out saltString, out hashString);
+            encryptionProvider.GetHashAndSaltString(userModel.Password, out hashString, out saltString);
 
             try
             {
@@ -50,8 +50,8 @@ namespace reddit_connect.Controllers
             }
         }
 
-        // POST api/user/login
-        [HttpPost, ActionName("login")]
+        // PUT api/user/login
+        [HttpPut, ActionName("login")]
         public HttpResponseMessage Login([FromBody]UserModel userModel)
         {
             if (userModel == null || String.IsNullOrEmpty(userModel.Email) || String.IsNullOrEmpty(userModel.Password))
@@ -84,7 +84,7 @@ namespace reddit_connect.Controllers
 
         // GET api/user/{id}/favorites
         [HttpGet, ActionName("favorites")]
-        public IEnumerable<FavoriteModel> Favorites(Guid? accessToken)
+        public IEnumerable<FavoriteModel> Favorites(Guid? accessToken = null)
         {
             if (accessToken == null)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Access token is required."));
