@@ -5,3 +5,7 @@ CREATE TABLE [UserFavorites]
 	[contentid] [nvarchar](128) NOT NULL,
 	[tagname] [nvarchar](256) NULL,
 )
+
+alter table UserFavorites add permalink varchar(256)
+alter table UserFavorites add url varchar(256)
+alter table UserFavorites add author varchar(64)

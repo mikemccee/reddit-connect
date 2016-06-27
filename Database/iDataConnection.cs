@@ -22,7 +22,7 @@ namespace reddit_connect.Database
 
         #region Content
 
-        bool CreateFavorite(int userID, string contentID, string tagName = null);
+        bool CreateFavorite(int userID, string contentID, string permalink, string url, string author, string tagName = null);
 
         bool FavoriteExists(int userID, string contentID);
 

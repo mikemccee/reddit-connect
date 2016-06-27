@@ -50,8 +50,8 @@ namespace reddit_connect.Controllers
             }
         }
 
-        // PUT api/user/login
-        [HttpPut, ActionName("login")]
+        // POST api/user/login
+        [HttpPost, ActionName("login")]
         public HttpResponseMessage Login([FromBody]UserModel userModel)
         {
             if (userModel == null || String.IsNullOrEmpty(userModel.Email) || String.IsNullOrEmpty(userModel.Password))
@@ -82,26 +82,41 @@ namespace reddit_connect.Controllers
             return Request.CreateResponse(HttpStatusCode.Found, String.Format("User access token: {0}", user.Token));
         }
 
-        // POST api/user/favorite
-        [HttpPost, ActionName("favorite")]
-        public HttpResponseMessage Favorite([FromBody]FavoriteModel favoriteModel)
+        // GET api/user/favorites
+        [HttpGet, ActionName("favorites")]
+        public IEnumerable<ContentModel> Favorites(Guid? accessToken = null)
         {
-            if (favoriteModel == null || !favoriteModel.AccessToken.HasValue)
-                return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Access Token is required.  Please log in if you need one.");
+            if (accessToken == null)
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.Forbidden, "Access token is required."));
 
             var user =
-                dataConnection.FetchUser(accessToken: favoriteModel.AccessToken.Value);
+                dataConnection.FetchUser(accessToken: accessToken);
 
             if (user == null)
-                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "No user could be found with that access token.  Plesae try again.");
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.NotFound, "No user could be found with that access token.  Plesae try again."));
 
-            if (dataConnection.FavoriteExists(user.ID, favoriteModel.ContentID))
-                return Request.CreateErrorResponse(HttpStatusCode.Forbidden, "You've already favorited that content.");
+            List<ContentModel> favoritesList = new List<ContentModel>();
 
-            bool success =
-                dataConnection.CreateFavorite(user.ID, favoriteModel.ContentID, favoriteModel.TagName);
+            var favorites =
+                dataConnection.GetFavorites(user.ID).ToList();
 
-            return Request.CreateResponse(HttpStatusCode.Created, "Content successfully favorited.");
+            if (favorites != null && favorites.Count > 0)
+            {
+                foreach (var favorite in favorites)
+                {
+                    favoritesList.Add(
+                        new ContentModel()
+                        {
+                            ID = favorite.ContentID,
+                            PermaLink = favorite.PermaLink,
+                            URL = favorite.URL,
+                            Author = favorite.Author,
+                            TagName = favorite.TagName,
+                        }
+                    );
+                }
+            }
+            return favoritesList;
         }
 
     }

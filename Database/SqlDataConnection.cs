@@ -126,9 +126,10 @@ namespace reddit_connect.Database
         public bool UpdateUser(User user)
         {
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            SqlCommand sqlCommand = new SqlCommand("update Users set token = @token", sqlConnection);
+            SqlCommand sqlCommand = new SqlCommand("update Users set token = @token where id = @id", sqlConnection);
 
             sqlCommand.Parameters.AddWithValue("@token", user.Token);
+            sqlCommand.Parameters.AddWithValue("@id", user.ID);
 
             using (sqlConnection)
             {
@@ -145,16 +146,19 @@ namespace reddit_connect.Database
 
         #region Content
 
-        public bool CreateFavorite(int userID, string contentID, string tagName = null)
+        public bool CreateFavorite(int userID, string contentID, string permalink, string url, string author, string tagName = null)
         {
             if (userID <= 0 && String.IsNullOrEmpty(contentID))
                 throw new ArgumentNullException("userID or contentID");
 
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            SqlCommand sqlCommand = new SqlCommand("insert into UserFavorites (userid, contentid, tagname) values (@userid, @contentid, @tagname)", sqlConnection);
+            SqlCommand sqlCommand = new SqlCommand("insert into UserFavorites (userid, contentid, tagname, permalink, url, author) values (@userid, @contentid, @tagname, @permalink, @url, @author)", sqlConnection);
 
             sqlCommand.Parameters.AddWithValue("@userid", userID);
             sqlCommand.Parameters.AddWithValue("@contentid", contentID);
+            sqlCommand.Parameters.AddWithValue("@permalink", permalink);
+            sqlCommand.Parameters.AddWithValue("@url", url);
+            sqlCommand.Parameters.AddWithValue("@author", author);
             sqlCommand.Parameters.AddWithValue("@tagname", tagName ?? "");
 
             using (sqlConnection)
@@ -204,7 +208,7 @@ namespace reddit_connect.Database
             List<UserFavorite> favorites = new List<UserFavorite>();
 
             SqlConnection sqlConnection = new SqlConnection(connectionString);
-            SqlCommand sqlCommand = new SqlCommand("select id, contentid, tagname from UserFavorites where userid = @userid", sqlConnection);
+            SqlCommand sqlCommand = new SqlCommand("select id, contentid, permalink,url, author, tagname from UserFavorites where userid = @userid", sqlConnection);
 
             sqlCommand.Parameters.AddWithValue("@userID", userID);
 
@@ -221,6 +225,9 @@ namespace reddit_connect.Database
                             {
                                 ID = Convert.ToInt32(dataReader["id"]),
                                 ContentID = dataReader["contentid"].ToString(),
+                                PermaLink = dataReader["permalink"].ToString(),
+                                URL = dataReader["url"].ToString(),
+                                Author = dataReader["author"].ToString(),
                                 TagName = dataReader["tagname"].ToString(),
                             }
                         );

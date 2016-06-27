@@ -13,6 +13,9 @@ namespace reddit_connect.Database
         public int ID;
         public int UserID;
         public string ContentID;
+        public string PermaLink { get; set; }
+        public string URL { get; set; }
+        public string Author { get; set; }
         public string TagName;
     }
 }

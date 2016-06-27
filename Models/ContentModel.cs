@@ -11,5 +11,6 @@ namespace reddit_connect.Models
         public string PermaLink { get; set; }
         public string URL { get; set; }
         public string Author { get; set; }
+        public string TagName { get; set; }
     }
 }
